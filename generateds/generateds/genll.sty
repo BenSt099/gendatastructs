@@ -1,0 +1,50 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{genll}[2023/08/15 Generate-LinkedLists]
+
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta} 
+\usetikzlibrary{positioning}
+\RequirePackage{xparse}
+\RequirePackage{ifthen}
+\RequirePackage{bootstrapcolors}
+
+\newcounter{numNodes}
+\newcounter{aa}
+\newcounter{hh}
+
+\NewDocumentEnvironment{linkedlist}{mmm}{
+    \setcounter{numNodes}{1}
+    \setcounter{aa}{1}
+    \setcounter{hh}{0}
+    \begin{tikzpicture}[main/.style={
+        draw=white, 
+        text=white, 
+        fill=#2,
+        rounded corners=2mm,
+        minimum size=2em}, special/.style={
+            draw=white, 
+            text=white, 
+            fill=#3,
+            rounded corners=2mm,
+            minimum size=2em
+        }]
+
+        \node[special] (0) {head};
+
+        \foreach \i in {#1}{
+            \node[main, right=of \thehh] (\thenumNodes) {$\i$};
+            \stepcounter{numNodes}
+            \stepcounter{hh}
+        }
+        \node[special, right=of \thehh] (\thenumNodes) {tail};
+        
+        \foreach \i in {0,...,\thenumNodes}{
+            \ifthenelse{\theaa < \thenumNodes \OR{\theaa = \thenumNodes}}{
+                \draw [line width=0.5mm,#3, -{Stealth[length=3mm, open, fill=none,color=#3]}](\i) -- (\theaa);
+                \stepcounter{aa}
+            }{}
+        }
+    }
+{
+    \end{tikzpicture}    
+}
