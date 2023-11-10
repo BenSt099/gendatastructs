@@ -18,7 +18,6 @@
 \RequirePackage{ifthen}
 \RequirePackage{bootstrapcolors}
 
-
 \newcounter{maxnodes}
 \newcounter{numberOfNodes}
 \newcounter{pointer}
@@ -68,31 +67,35 @@
                     }{}
                 }
 
-            }{}
-            % #2 > 0
-
-            \foreach \i in {#1}{
-                \ifthenelse{\thecounter < \themaxnodes}{
-                    \node[main, right=of \thepredecessor] (\thenumberOfNodes) {$\i$};
-                    \stepcounter{predecessor}
-                    \stepcounter{numberOfNodes}
-                    \stepcounter{counter}
-                }{
-                    % new line
-                    \node[main, below=of \thepointer] (\thenumberOfNodes) {$\i$};
-                    \setcounter{pointer}{\thenumberOfNodes}
-                    \stepcounter{numberOfNodes}
-                    \stepcounter{predecessor}
-                    \setcounter{counter}{1}
-                }  
-            }
-
-            \ifthenelse{\thecounter < \themaxnodes}{
-                \node[special, right=of \thepredecessor] (\thenumberOfNodes) {tail};
             }{
-                %\stepcounter{pointer}
-                \node[special, below=of \thepointer] (\thenumberOfNodes) {tail};
+                % #2 > 0
+                \foreach \i in {#1}{
+                    \ifthenelse{\thecounter < \themaxnodes}{
+                        \node[main, right=of \thepredecessor] (\thenumberOfNodes) {$\i$};
+                        \draw [line width=0.5mm,#4, -{Stealth[length=3mm, open, fill=none,color=#4]}](\thepredecessor) -- (\thenumberOfNodes);
+                        \stepcounter{predecessor}
+                        \stepcounter{numberOfNodes}
+                        \stepcounter{counter}
+                    }{
+                        % new line
+                        \node[main, below=of \thepointer] (\thenumberOfNodes) {$\i$};
+                        \setcounter{pointer}{\thenumberOfNodes}
+                        \stepcounter{numberOfNodes}
+                        \stepcounter{predecessor}
+                        \setcounter{counter}{1}
+                    }  
+                }
+    
+                \ifthenelse{\thecounter < \themaxnodes \OR{\thecounter = \themaxnodes}}{
+                    \node[special, right=of \thepredecessor] (\thenumberOfNodes) {tail};
+                    \draw [line width=0.5mm,#4, -{Stealth[length=3mm, open, fill=none,color=#4]}](\thepredecessor) -- (\thenumberOfNodes);
+                }{
+                    \node[special, below=of \thepointer] (\thenumberOfNodes) {tail};
+                }
             }
+            
+
+           
 
             % Edges
             %\foreach \i in {0,...,\thenumNodes}{
