@@ -8,41 +8,91 @@
 \RequirePackage{ifthen}
 \RequirePackage{bootstrapcolors}
 
+\DeclareOption*{\PackageWarning{gendatastructs}{This package has no option ‘\CurrentOption’}}
+
 \newcounter{numNodes}
 \newcounter{aa}
 \newcounter{hh}
+\newcounter{maxnodes}
+\newcounter{counter}
 
-\NewDocumentEnvironment{linkedlist}{mmm}{
+\newenvironment{linkedlist}[4]{
     \setcounter{numNodes}{1}
     \setcounter{aa}{1}
     \setcounter{hh}{0}
     \begin{tikzpicture}[main/.style={
         draw=white, 
         text=white, 
-        fill=#2,
+        fill=#3,
         rounded corners=2mm,
         minimum size=2em}, special/.style={
             draw=white, 
             text=white, 
-            fill=#3,
+            fill=#4,
             rounded corners=2mm,
             minimum size=2em
         }]
 
         \node[special] (0) {head};
 
-        \foreach \i in {#1}{
-            \node[main, right=of \thehh] (\thenumNodes) {$\i$};
-            \stepcounter{numNodes}
-            \stepcounter{hh}
-        }
-        \node[special, right=of \thehh] (\thenumNodes) {tail};
-        
-        \foreach \i in {0,...,\thenumNodes}{
-            \ifthenelse{\theaa < \thenumNodes \OR{\theaa = \thenumNodes}}{
-                \draw [line width=0.5mm,#3, -{Stealth[length=3mm, open, fill=none,color=#3]}](\i) -- (\theaa);
-                \stepcounter{aa}
+        \ifthenelse{#2 = 0 \OR{#2 > 0}}{
+            % #2 = 0
+            \ifthenelse{#2 = 0}{
+                \foreach \i in {#1}{
+                    \node[main, right=of \thehh] (\thenumNodes) {$\i$};
+                    \stepcounter{numNodes}
+                    \stepcounter{hh}
+                }
+                \node[special, right=of \thehh] (\thenumNodes) {tail};
+                
+                \foreach \i in {0,...,\thenumNodes}{
+                    \ifthenelse{\theaa < \thenumNodes \OR{\theaa = \thenumNodes}}{
+                        \draw [line width=0.5mm,#3, -{Stealth[length=3mm, open, fill=none,color=#3]}](\i) -- (\theaa);
+                        \stepcounter{aa}
+                    }{}
+                }
+
             }{}
+            % #2 > 0
+            \setcounter{maxnodes}{#2}
+            \setcounter{counter}{1}
+
+            \foreach \i in {#1}{
+                ifthenelse{\thecounter < \themaxnodes \OR{\thecounter = \themaxnodes}}{
+                    \node[main, right=of \thehh] (\thenumNodes) {$\i$};
+                    \stepcounter{numNodes}
+                    \stepcounter{hh}
+                    \stepcounter{counter}
+                }{
+                    % new line
+                    \node[main, below=of \thenumNodes] (\thenumNodes) {$\i$};
+                    \stepcounter{numNodes}
+                    \stepcounter{hh}
+                    \setcounter{counter}{1}
+                }  
+            }
+
+            ifthenelse{\thecounter < \themaxnodes \OR{\thecounter = \themaxnodes}}{
+                \node[special, right=of \thehh] (\thenumNodes) {tail};
+            }{
+                \node[special, below=of \thenumNodes] (\thenumNodes) {tail};
+            }
+
+            % Edges
+            \foreach \i in {0,...,\thenumNodes}{
+                \ifthenelse{\theaa < \thenumNodes \OR{\theaa = \thenumNodes}}{
+                    \draw [line width=0.5mm,#4, -{Stealth[length=3mm, open, fill=none,color=#4]}](\i) -- (\theaa);
+                    \stepcounter{aa}
+                }{
+                    \draw [line width=0.5mm,#4, color=#4, dashed, length=4mm](\i) -- (\theaa);
+                    \stepcounter{aa}
+                }
+            }
+            
+
+
+        }{
+            \PackageError{gendatastructs}{Second arg not a positive integer.}{Change second argument to integer that is >= zero.}
         }
     }
 {
